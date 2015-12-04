@@ -3,4 +3,5 @@ module Main where
 import Lib
 
 main :: IO ()
-main = someFunc
+main = do
+  print $ kleinberg [1,3,4,5,19,29] $ defOpts
