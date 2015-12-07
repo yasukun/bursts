@@ -2,6 +2,7 @@ module Lib
     ( kleinberg
      ,KleinbergOpts(state,gamma)
      ,defOpts
+     , computeK
     ) where
 
 import Data.List
@@ -19,12 +20,11 @@ computeK
   :: (Integral r, Integral b, Real a, Real a1, Foldable t) =>
      a1 -> t r -> a -> b
 computeK state gaps total =
-    ceiling d
+    ceiling $ 1 + c + b
     where
-      a = (fromIntegral 1) / (fromIntegral $ minimum gaps)
-      b = logBase (realToFrac a) (realToFrac state)
+      a = 1 / (fromIntegral $ minimum gaps)
+      b = logBase (realToFrac state) a
       c = logBase (realToFrac total) (realToFrac state)
-      d = 1 + c + b
 
 data KleinbergOpts = KleinbergOpts {
       state :: Int,
@@ -35,7 +35,7 @@ defOpts :: KleinbergOpts
 defOpts =  KleinbergOpts {state=2, gamma=1}
 
 kleinberg offsets opts =
-    gammalogn
+    alpha
     where offsets' = sort offsets
           gaps = calcGaps offsets'
           total = sum gaps
@@ -44,3 +44,5 @@ kleinberg offsets opts =
           k = computeK (state opts) gaps total
           gammalogn = realToFrac (gamma opts) * log (fromIntegral count)
           tau = \x y -> if x >= y then 0 else (y -x) * gammalogn
+          alpha = map (\x -> realToFrac (state opts) ** x / ghat) $ take (k - 1) [0..]
+          f = \j x -> (alpha !! j) * alpha !! j
