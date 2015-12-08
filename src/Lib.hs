@@ -2,10 +2,12 @@ module Lib
     ( kleinberg
      ,KleinbergOpts(state,gamma)
      ,defOpts
-     , computeK
+     ,computeK
+     ,computeOpt
     ) where
 
 import Data.List
+import Data.Matrix
 
 calcGaps :: Num b => [b] -> [b]
 calcGaps offsets =
@@ -34,8 +36,14 @@ data KleinbergOpts = KleinbergOpts {
 defOpts :: KleinbergOpts
 defOpts =  KleinbergOpts {state=2, gamma=1}
 
+computeOpt k tau f gaps cprime qprime coll =
+    fst
+    where
+      fst = coll !! 0
+      -- cost = map (\ell -> (realToFrac (cprime !! ell)) + tau ell fst) $ take k [1..]
+
 kleinberg offsets opts =
-    alpha
+    computeOpt k tau f gaps c q $ take count [1..]
     where offsets' = sort offsets
           gaps = calcGaps offsets'
           total = sum gaps
@@ -45,4 +53,8 @@ kleinberg offsets opts =
           gammalogn = realToFrac (gamma opts) * log (fromIntegral count)
           tau = \x y -> if x >= y then 0 else (y -x) * gammalogn
           alpha = map (\x -> realToFrac (state opts) ** x / ghat) $ take (k - 1) [0..]
-          f = \j x -> (alpha !! j) * alpha !! j
+          f = \j x ->  (alpha !! j) * (exp $ -1 * alpha !! j * x)
+          inf = 1/0
+          na = 0/0
+          c = 0:(take (k - 1) $ repeat inf)
+          q = matrix k total $ \(i,j) -> na
