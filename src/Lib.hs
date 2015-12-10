@@ -2,8 +2,7 @@ module Lib
     ( kleinberg
      ,KleinbergOpts(state,gamma)
      ,defOpts
-     ,computeK
-     ,computeOpt
+     ,replaceNth
     ) where
 
 import Data.List
@@ -36,25 +35,37 @@ data KleinbergOpts = KleinbergOpts {
 defOpts :: KleinbergOpts
 defOpts =  KleinbergOpts {state=2, gamma=1}
 
-computeOpt k tau f gaps cprime qprime coll =
-    fst
-    where
-      fst = coll !! 0
-      -- cost = map (\ell -> (realToFrac (cprime !! ell)) + tau ell fst) $ take k [1..]
+minIndex :: Ord b => [b] -> Int
+minIndex xs = head $ filter ((== minimum xs) . (xs !!)) [0..]
+
+replaceNth n newVal (x:xs)
+    | n ==  0 = newVal:xs
+    | otherwise = x:replaceNth (n-1) newVal xs
 
 kleinberg offsets opts =
-    computeOpt k tau f gaps c q $ take count [1..]
-    where offsets' = sort offsets
-          gaps = calcGaps offsets'
+    foldl (\x t ->
+               let (cprime, qprime) = x
+               in foldl (\y j ->
+                        let (c, q) = y
+                            cost = map (\ell ->
+                                            c !! ell + tau (realToFrac ell) (realToFrac j)) [0..(k - 1)]
+                            minidx = minIndex cost
+                            cresult = cost !! minidx - (f j (realToFrac (gaps !! t)))
+                        in (replaceNth minidx cresult c, q))
+               (cprime, qprime)
+               [0..(k - 1)])
+    (cdef, qdef)
+    [0..(len - 1)]
+    where gaps = calcGaps $ sort offsets
           total = sum gaps
-          count = length gaps
-          ghat = (fromIntegral total) / (fromIntegral count)
+          len = length gaps
+          ghat = (fromIntegral total) / (fromIntegral len)
           k = computeK (state opts) gaps total
-          gammalogn = realToFrac (gamma opts) * log (fromIntegral count)
+          gammalogn = realToFrac (gamma opts) * log (realToFrac len)
           tau = \x y -> if x >= y then 0 else (y -x) * gammalogn
-          alpha = map (\x -> realToFrac (state opts) ** x / ghat) $ take (k - 1) [0..]
-          f = \j x ->  (alpha !! j) * (exp $ -1 * alpha !! j * x)
+          alpha = map (\x -> realToFrac (state opts) ** (realToFrac x) / ghat) [0..(k - 1)]
+          f = \j x -> (alpha !! j) * (exp $ -1 * (alpha !! j) * x)
           inf = 1/0
           na = 0/0
-          c = 0:(take (k - 1) $ repeat inf)
-          q = matrix k total $ \(i,j) -> na
+          cdef = 0:(take (k - 1) $ repeat inf)
+          qdef = matrix k total $ \(i,j) -> na
