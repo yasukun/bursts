@@ -25,7 +25,14 @@ kleinberg offsets opts =
                                         minidx = minIndex cost
                                     in (cost !! minidx - log (f j $ realToFrac $ gaps !! t), minidx))
                            [0..(k - 1)]
-                       p = map (\ell -> ell) (map snd c)
+                       elems = (map snd c)
+                       q = foldl (\q' y ->
+                                      let (ell, j) = y
+                                          newval = realToFrac j
+                                      in setElem  newval ((j - 1), (t - 1)) q'
+                                 )
+                           qprime
+                           (zip elems [0..(length elems  - 1)])
                    in (map fst c,qprime))
               (initC, initQ)
               [0..(len - 1)]
