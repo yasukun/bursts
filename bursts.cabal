@@ -2,12 +2,12 @@ name:                bursts
 version:             0.1.0.0
 synopsis:            Initial project template from stack
 description:         Please see README.md
-homepage:            http://github.com/githubuser/bursts#readme
-license:             BSD3
+homepage:            https://github.com/yasukun/bursts
+license:             MIT
 license-file:        LICENSE
-author:              Author name here
-maintainer:          example@example.com
-copyright:           2010 Author Here
+author:              yasukun
+maintainer:          https://twitter.com/sukezo
+copyright:           2015 yasukun
 category:            Web
 build-type:          Simple
 -- extra-source-files:
@@ -17,7 +17,6 @@ library
   hs-source-dirs:      src
   exposed-modules:     Lib
   build-depends:       base >= 4.7 && < 5
-                     , matrix
   default-language:    Haskell2010
 
 executable bursts-exe
@@ -26,6 +25,7 @@ executable bursts-exe
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , bursts
+                     , cmdargs
   default-language:    Haskell2010
 
 test-suite bursts-test
@@ -39,4 +39,4 @@ test-suite bursts-test
 
 source-repository head
   type:     git
-  location: https://github.com/githubuser/bursts
+  location: https://github.com/yasukun/bursts

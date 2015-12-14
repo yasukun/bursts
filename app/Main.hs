@@ -1,7 +1,22 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 module Main where
 
 import Lib
+import System.Console.CmdArgs
 
-main :: IO ()
+data Bursts = Bursts {
+      numargs :: [Int],
+      numstate :: Int,
+      numgamma :: Int
+    } deriving (Show, Data, Typeable)
+
+bursts = Bursts
+         {
+           numargs = def &= args &= typ "NUMS",
+           numstate = 2 &= args &= typ "NUM",
+           numgamma = 1 &= args &= typ "NUM"
+         }
+
 main = do
-  print $ kleinberg [1,2,3,10,11,12,13,14,20,25,30] $ defOpts
+  opts <- cmdArgs bursts
+  print $ kleinberg (numargs opts) $ defOpts {state=(numstate opts), gamma=(numgamma opts)}

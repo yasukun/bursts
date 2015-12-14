@@ -1,6 +1,6 @@
 module Lib
     ( kleinberg
-     ,KleinbergOpts(state,gamma)
+     ,KleinbergOpts(..)
      ,defOpts
     ) where
 
