@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 module Main where
 
-import Lib
+import Algo.Lib
 import System.Console.CmdArgs
 
 data Bursts = Bursts {
